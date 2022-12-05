@@ -16,7 +16,7 @@ const getGQL = url =>
             } else throw new Error(JSON.stringify(data.errors));
         });
 
-const URL = `http://hipstagram.node.ed.asmer.org.ua/`
+const URL = `http://localhost:4000/`
 
 const gql = getGQL(`${URL}graphql`)
 

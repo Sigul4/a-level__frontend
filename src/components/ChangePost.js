@@ -14,14 +14,21 @@ import ListOfImages             from './ListOfImaged.js';
 export default function CreatePost ({_id, defaultTitle='', defaultText='', defaultImages = [],onStopChange, onChange}){
     
     const [images, ChangeImages] = useState(defaultImages)
-    const [imagesIds, ChangeImagesIds] = useState(defaultImages.map(img => {return {_id: img._id}}))
+    const [imagesIds, ChangeImagesIds] = useState(defaultImages?.map(img => {return {_id: img._id}}))
     
     const [title, ChangeTitle] = useState(defaultTitle)
     const [text, ChangeText] = useState(defaultText)
 
+    const URL = 'http://localhost:4000/images/'
+
     useEffect(()=>{
-        // console.log('images',images)
+        console.log('images',images)
     },[images])
+
+
+    useEffect(()=>{
+        console.log('!!!!!!!!!!imagesIds',imagesIds)
+    },[imagesIds])
 
     
     // console.log("imagesIds",imagesIds)
@@ -50,13 +57,15 @@ export default function CreatePost ({_id, defaultTitle='', defaultText='', defau
                         />
                     <Drop imageData={(image) => {
                         // console.log('!!!!!',image)
-                        ChangeImages(prevArray => prevArray ? prevArray.concat(image.map((img) => {return {url: `${URL}${img.url}`}})): image.map((img) => {return {url: `${URL}${img.url}`}}))
-                        ChangeImagesIds(prevArray => prevArray ? prevArray.concat(image.map((img) => {return {_id: img._id}})): image.map((img) => {return {_id: img._id}}))
-                        }} onUpload={uploadFile}/>
+                        ChangeImages(prevArray => prevArray ? prevArray.concat(image.map((img) => {console.log(img); return {url: `${URL}${img.image_originalname}`}})): image.map((img) => {console.log(img);return {url: `${URL}${img.image_originalname}`}}))
+                        ChangeImagesIds(prevArray => prevArray ? prevArray.concat(image.map((img) => {return {_id: img.image_id}})): image.map((img) => {return {_id: img.image_id}}))
+                        }} 
+                        onUpload={uploadFile}
+                    />
                     <ListOfImages images={images} ChangeImagesIds={ChangeImagesIds} ChangeImages={ChangeImages} />
                     {/* Select images: {images?.length}{images?.length === 0}{console.log('imagesssss',images?.length === 0)} */}
                     {/* <Button onClick={()=>{}}><h3>Drop to start values</h3></Button> */}
-                    <Button onClick={() => {images?.length === 0 ? onChange(newPost(title, text, _id)): onChange(newPostWithImages(title, text, imagesIds, _id));}}><h3>Add post</h3></Button>
+                    <Button onClick={() => {images?.length === 0 ? onChange(newPost(title, text, _id), console.log(images)): onChange(newPostWithImages(title, text, imagesIds, _id));}}><h3>Add post</h3></Button>
                 </form> 
             </Card>
     )

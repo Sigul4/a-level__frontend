@@ -4,7 +4,7 @@ import {actionPromise}  from "./actionPromise"
 
 const actionFullLogin = (login, password) =>
 async (dispatch) => {
-    const gqlQuery = `query log($login:String!, $password:String!){
+    const gqlQuery = `query login($login:String!, $password:String!){
                         login(login:$login, password:$password)
                     }`
     const gqlPromise = gql(gqlQuery, {login, password})

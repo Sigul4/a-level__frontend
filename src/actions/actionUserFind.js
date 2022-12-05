@@ -4,16 +4,17 @@ import { actionPromise }    from "./actionPromise"
 
 const actionUserFind = (text) =>
 async (dispatch) => {
-    // console.log('Работаем, проверяй...')
-
     const gqlQuery = 
-    `query usery($users: String){
-        UserFind(query:$users){
-            _id login nick avatar{url}
+    `query actionUserFind($query: SortObj){
+        getUsers(query: $query){
+            user_id
+            user_nick 
+            user_createAt 
+            user_login  
         }
     }`
     
-    const gqlPromise = await gql(gqlQuery, {"users": JSON.stringify([{"login": {"$regex": text}},{"sort": [{"createAt": -1}]}])})
+    const gqlPromise = await gql(gqlQuery, {"query": {byWhat:"user_nick", value:text, how:"regexp"}})
 
     const action = actionPromise('requiredNicknames', gqlPromise) 
     await dispatch(action)

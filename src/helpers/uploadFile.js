@@ -2,9 +2,9 @@ const uploadFile = async (file) =>{
     console.log('иде')
     // console.log(file)
     const uploadFile = async (file) => {
-        const url = `http://hipstagram.node.ed.asmer.org.ua/upload`
+        const url = `http://localhost:4000/upload`
         let formData = await new FormData()
-        formData.append('photo', file);
+        formData.append('file', file);
         return fetch(url, {
                     method: "POST",
                     headers: localStorage.authToken ? {Authorization: 'Bearer ' + localStorage.authToken} : {},

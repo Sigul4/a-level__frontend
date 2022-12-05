@@ -17,8 +17,8 @@ export default function PostWrapper({ post, aboutMe, changePostsToDelete, recove
     const postUnlike = (id) => dispatch(actionRemoveLike(id))
 
     useEffect(() => {
-        // console.log("changer", changer);
-    }, [changer]);
+        console.log("postData", postData,postData.post_title);
+    }, [postData]);
 
     const deletePost = () =>{
         // console.log('postData',postData)
@@ -42,15 +42,15 @@ export default function PostWrapper({ post, aboutMe, changePostsToDelete, recove
             !deletedPost
                 ?<Post
                     className="post"
-                    userId={aboutMe._id}
-                    postId={postData._id}
-                    title={`${postData.title}`}
-                    text={`${postData.text}`}
-                    createdAt={`${postData.createdAt}`}
+                    user_id={aboutMe.user_id}
+                    post_id={postData.post_id}
+                    post_title={postData.post_title}
+                    post_text={`${postData.post_text}`}
+                    post_createAt={`${postData.post_createAt}`}
                     comments={postData.comments}
-                    owner={postData.owner}
+                    user={postData.user}
                     images={postData.images}
-                    likes={postData.likes}
+                    postLikes={postData.postLikes}
                     postLike={postLike}
                     postUnlike={postUnlike}
                     onChangePost={() => switchChange(!changer)}
@@ -59,14 +59,14 @@ export default function PostWrapper({ post, aboutMe, changePostsToDelete, recove
                 :<Alert style={{width: 400, margin: 40}} severity="error">
                     <AlertTitle>Post has been deleted</AlertTitle>
                     <span>if u wont to recover this one, just click here <br/>{`===>`}
-                    <Button onClick={recover}><strong>Give me back my post!!!!111</strong></Button></span>
+                    <Button onClick={() => recover(postData._id)}><strong>Give me back my post!!!!111</strong></Button></span>
                 </Alert>
         ) : (
             <CreatePost
                 _id={postData._id}
                 defaultTitle={postData.title}
                 defaultText={postData.text}
-                defaultImages={postData.images}
+                defaultImages={postData?.images}
                 onChange={showData}
                 onStopChange={() => switchChange(!changer)}
             />

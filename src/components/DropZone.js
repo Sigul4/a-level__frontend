@@ -14,7 +14,8 @@ export default function Drop({imageData, onUpload}) {
         {({getRootProps, getInputProps}) => (
             <section>
             <div style={{border: "2px gray dashed", padding: '10px 40px'}} {...getRootProps()}>
-                <input {...getInputProps()} />
+                <input {...getInputProps()} type="file" name="file"  />
+                {console.log('{...getInputProps()}',{...getInputProps()})}
                 <span><AddPhotoAlternateOutlinedIcon/>Drag 'n' drop some files here, or click to select files</span>
             </div>
             </section>

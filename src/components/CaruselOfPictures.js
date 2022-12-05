@@ -51,7 +51,7 @@ function SwipeableTextMobileStepper({images}) {
         enableMouseEvents
       >
         {images.map((step, index) => (
-          <div key={step.url}>
+          <div key={step.image.image_id}>
             {Math.abs(activeStep - index) <= 2 ? (
               <Box
                 component="img"
@@ -62,7 +62,7 @@ function SwipeableTextMobileStepper({images}) {
                   overflow: 'hidden',
                   width: '100%',
                 }}
-                src={`http://hipstagram.node.ed.asmer.org.ua/${step.url}`}
+                src={step.image.image_originalname ? `http://localhost:4000/images/${step.image.image_originalname}`:''}
               />
             ) : null}
           </div>

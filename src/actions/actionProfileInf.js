@@ -4,12 +4,12 @@ import {actionPromise}    from "./actionPromise"
 const actionProfileInf = (_id) =>
 async (dispatch) => {
   const gqlQuery = 
-  `query users($id: String){
-    UserFindOne(query:$id) {
-      _id nick createdAt login nick avatar{url} likesCount followers{_id} following{_id}
+  `query users($id: ID!){
+    getUser(user_id:$id) {
+      user_id user_nick user_createAt user_login user_nick likesCount followers{user_id} followings{user_id}
     }
   }`
-    const gqlPromise = gql(gqlQuery, {"id": JSON.stringify([{_id}])})
+    const gqlPromise = gql(gqlQuery, {"id": _id})
     const action = actionPromise('ProfileInf', gqlPromise)
     await dispatch(action)
   }

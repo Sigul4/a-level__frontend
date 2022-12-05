@@ -6,7 +6,7 @@ import actionAboutMe        from "../actions/actionAboutMe";
 const actionAllPosts = (clearPosts = false) =>
 async (dispatch, getState) => {
     let howMuchToSkip
-    await dispatch(actionAboutMe(getState().auth.payload.sub.id))
+    await dispatch(actionAboutMe(getState().auth.payload.id))
 
     const posts = getState().promise?.AllPosts?.payload
     const arrOfFollows = getState().promise?.aboutMe?.payload?.following?.map(follow => follow._id)
@@ -17,12 +17,38 @@ async (dispatch, getState) => {
 
     const gqlQuery = 
     `query post($query:String){
-        PostFind(query:$query){
-            _id title text images{_id url} createdAt likesCount comments{_id createdAt text likesCount owner{_id nick login avatar{_id url}} answerTo{_id}} directs{text} likesCount 
-            owner{_id login nick avatar{_id url}} likes{_id owner{_id}}
+        getPosts(query:$query){
+            post_id
+            post_title
+            post_text
+            post_createAt
+            likesCount
+    		postLikes{
+                user_id
+            }
+            user{
+                user_id 
+                user_nick 
+                user_login
+            }
+            comments{
+                comment_id 
+                comment_createAt 
+                comment_text 
+                likesCount     
+                user{
+                    user_id 
+                    user_nick 
+                    user_login
+                    commentLikes{
+                        comment_id 
+                        user_id
+                    }
+                } 
+            }  
         }
     }`
-    const gqlPromise = await gql(gqlQuery, {"query":  JSON.stringify([{___owner: {$in: arrOfFollows}},{limit:[10],skip:[howMuchToSkip],sort:[{_id:-1}]}])})
+    const gqlPromise = await gql(gqlQuery, {"query":  {SortObj:{byWhat:"user_id", value:"56", how: "eq"},SortInput:{limit:100,skip:howMuchToSkip,sort:{key:"post_id", type:"ASC"}}}})
 
     const action = !clearPosts ? posts ? actionFulfilled('AllPosts', [...posts, ...gqlPromise]) : actionFulfilled('AllPosts', gqlPromise):actionFulfilled('AllPosts', [])  
     await dispatch(action)

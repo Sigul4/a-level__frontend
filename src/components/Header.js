@@ -19,10 +19,10 @@ import Typography             from "@mui/material/Typography";
 import * as React             from "react";
 import { connect } from "react-redux";
 import { Link }               from 'react-router-dom';
-import actionAuthLogout from "../actions/actionAuthLogout";
-import actionUserFind from "../actions/actionUserFind";
+import actionAuthLogout       from "../actions/actionAuthLogout";
+import actionUserFind         from "../actions/actionUserFind";
 import history                from '../data/history';
-import UsersSearch            from './UsersSearch';
+import UsersSearch            from "./UsersSearch";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -51,7 +51,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
 }));
 
 
-function Header({userNick, userId,userData, requiredNicknames,Logout, onChooseNick}) {
+function Header({userNick, userId, userData, Logout, onChooseNick}) {
   // console.log('userData',userData,userNick, userId)
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -181,7 +181,7 @@ function Header({userNick, userId,userData, requiredNicknames,Logout, onChooseNi
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <UsersSearch  requiredNicknames={requiredNicknames} onChooseNick={onChooseNick}/>
+            <UsersSearch onChooseNick={onChooseNick}/>
           </Search>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -224,10 +224,9 @@ function Header({userNick, userId,userData, requiredNicknames,Logout, onChooseNi
 
 export const CHeader = connect(
   (state) => ({
-    userNick: state?.auth?.payload?.sub?.acl[1],
-    userId: state?.auth?.payload?.sub?.id,
+    userNick: state?.promise?.aboutMe?.payload.user_nick,
+    userId: state?.auth?.payload?.id,
     userData: state?.promise?.aboutMe?.payload,
-    requiredNicknames: state?.promise?.requiredNicknames?.payload,
   }),
   { Logout: actionAuthLogout, onChooseNick: actionUserFind }
 )(Header);

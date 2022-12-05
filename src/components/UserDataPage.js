@@ -29,19 +29,21 @@ import actionChangeProfile from '../actions/actionChangeProfile';
 
 const UserPage = ({match: {params: {_id}}, onProfileChange, onFollow, onUnfollow, onLoadCollection }) => {
     
+    console.log('_id',_id)
     const aboutMe     = useSelector(state => state?.promise?.aboutMe?.payload)
     const props       = useSelector(state => state?.promise?.ProfileInf?.payload)
-    const posts       = useSelector(state => state?.promise?.ProfilePosts?.payload)
-    const dispatch = useDispatch()
+    const takingPosts = useSelector(state => state?.promise?.ProfilePosts?.payload)
+    const dispatch    = useDispatch()
 
     let   [SmthToView,             ChangeView]   = useState([])
     const [takingData,          SetTakingData]   = useState(false)
+    const [posts,                    SetPosts]   = useState([])
     const [follow,                  SetFollow]   = useState()
     const [postsToDelete, changePostsToDelete]   = useState([]);
     const [avatarSrc,         changeAvatarSrc]   = useState('')
     const [popUpDropMenu, changePopUpDropMenu]   = useState(false)
     const [profileImage,   ChangeProfileImage]   = useState([])
-    const [nick,                   changeNick]   = useState(props?.nick)
+    const [nick,                   changeNick]   = useState(props?.user_nick)
     const [nickChanged,        setNickChanged]   = useState(false)
     const [checkedProps,      setCheckedProps]   = useState(false)
 
@@ -58,7 +60,7 @@ const UserPage = ({match: {params: {_id}}, onProfileChange, onFollow, onUnfollow
     
     useEffect(() => {
         dispatch(actionProfileCollections)
-        return () => console.log(postsToDelete,"Posts To Delete",postsToDelete.map(id => deletePost(id)))
+        return () => console.log(postsToDelete,"Posts To Delete",postsToDelete?.map(id => deletePost(id)))
     }, []);
 
     useEffect(()=>{
@@ -82,18 +84,24 @@ const UserPage = ({match: {params: {_id}}, onProfileChange, onFollow, onUnfollow
     useEffect(()=>{
         if(!!aboutMe && props !== checkedProps){
             setCheckedProps(props)
-            SetFollow(props?.followers?.map((follower) => follower._id === aboutMe._id).includes(true))
+            SetFollow(props?.followers?.map((follower) => follower.user_id === aboutMe.user_id).includes(true))
         }
     },[props])
     
     useEffect(()=>{
-        // console.log('posts',posts)
+        console.log('takingPosts has been updated IN USEFECT',takingPosts,posts)
         if(!!aboutMe)ChangeView(posts?.map(post => <PostWrapper key={post._id} post={post} aboutMe={aboutMe} changePostsToDelete={addPostToDelete} recoverPost={recoverPost} className="post"/> ))
     },[posts])
     
     useEffect(()=>{
         if(props?.avatar?.url)changeAvatarSrc(`http://hipstagram.node.ed.asmer.org.ua/${props?.avatar?.url}`)
     },[props])
+    
+    
+    useEffect(()=>{
+        console.log('posts has been updated IN USEFECT',posts)
+        SetPosts(takingPosts)
+    },[takingPosts])
     
 
     function onScroll(e) {
@@ -126,23 +134,23 @@ const UserPage = ({match: {params: {_id}}, onProfileChange, onFollow, onUnfollow
                         <Box sx={{position: "relative", left:30, top:-70,width: 350, height: 100}}>                    
                             <CardHeader
                                 avatar={
-                                <div onClick={() => !!aboutMe && _id === aboutMe._id ? changePopUpDropMenu(!popUpDropMenu): ()=>{}} style={{width: 100, height: 100,}}>
-                                {!!aboutMe && _id === aboutMe._id ?<ModeIcon sx={{fontSize: 50, color: 'white',zIndex: 3,position: "absolute",left:"42px", top:"42px", opacity: "0","&:hover": {opacity: "1"}}}/>: ''}
+                                <div onClick={() => !!aboutMe && _id === aboutMe.user_id ? changePopUpDropMenu(!popUpDropMenu): ()=>{}} style={{width: 100, height: 100,}}>
+                                {!!aboutMe && _id === aboutMe.user_id ?<ModeIcon sx={{fontSize: 50, color: 'white',zIndex: 3,position: "absolute",left:"42px", top:"42px", opacity: "0","&:hover": {opacity: "1"}}}/>: ''}
                                 <Avatar sx={{ bgcolor: red[500], width: 100, height: 100,}} alt='' aria-label="recipe" src={avatarSrc}><h1>{props?.login? props?.login[0].toUpperCase(): '' }</h1></Avatar>
                                 </div>
                                 }/>
                                 
                             <Box sx={{position: "absolute", left:180, top:70}}>
                                 {/* {!!nickChanged === true? 'wdwd':'' */}
-                                {!!aboutMe && _id !== aboutMe._id 
-                                    ?<h2>{props?.nick ? props?.nick :props?.login}</h2>
+                                {!!aboutMe && _id !== aboutMe.user_id 
+                                    ?<h2>{props?.user_nick ? props?.user_nick :props?.user_login}</h2>
                                     :!nickChanged
-                                        ?<Box style={{display:"flex", flexDirection:"row"}}><h2>{props?.nick ? props?.nick : "Set Nick"}</h2>{!!aboutMe && _id === aboutMe._id ? <Button onClick={() => setNickChanged(!nickChanged)}><ModeIcon sx={{fontSize: 20, opacity: "1","&:hover": {opacity: "1"}}}/></Button>: ''}</Box>
-                                        :<Box style={{display:"flex", flexDirection:"row", width: 400}}><TextField required id="standard-required" defaultValue={props?.nick} variant="standard" onChange={(e) => {changeNick(nick => nick = e.target.value)}}/><Button onClick={async() =>  {await onProfileChange(null, nick); onLoadUserInf(_id);setNickChanged(!nickChanged)}}>✔</Button><Button onClick={() =>  {setNickChanged(!nickChanged)}}>Х</Button></Box>}
+                                        ?<Box style={{display:"flex", flexDirection:"row"}}><h2>{props?.user_nick ? props?.user_nick : "Set Nick"}</h2>{!!aboutMe && _id === aboutMe.user_id ? <Button onClick={() => setNickChanged(!nickChanged)}><ModeIcon sx={{fontSize: 20, opacity: "1","&:hover": {opacity: "1"}}}/></Button>: ''}</Box>
+                                        :<Box style={{display:"flex", flexDirection:"row", width: 400}}><TextField required id="standard-required" defaultValue={props?.user_nick} variant="standard" onChange={(e) => {changeNick(nick => nick = e.target.value)}}/><Button onClick={async() =>  {await onProfileChange(null, nick); onLoadUserInf(_id);setNickChanged(!nickChanged)}}>✔</Button><Button onClick={() =>  {setNickChanged(!nickChanged)}}>Х</Button></Box>}
                             </Box>
                         </Box>
                         <Box sx={{width: 200}}>
-                        {!!aboutMe && _id !== aboutMe._id? !follow ? <Button variant="contained" onClick={() => {SetFollow(!follow); onFollow(_id)}}>Subscribe</Button>: <Button variant="outlined" onClick={() => {SetFollow(!follow); onUnfollow(_id)}}>Unsubscribe</Button> :''}
+                        {!!aboutMe && _id !== aboutMe.user_id? !follow ? <Button variant="contained" onClick={() => {SetFollow(!follow); onFollow(_id)}}>Subscribe</Button>: <Button variant="outlined" onClick={() => {SetFollow(!follow); onUnfollow(_id)}}>Unsubscribe</Button> :''}
                         </Box>
                         <Stack
                         direction="row"
@@ -152,14 +160,19 @@ const UserPage = ({match: {params: {_id}}, onProfileChange, onFollow, onUnfollow
                         >
                             { <Box><SportsMartialArtsIcon/>followers: {props?.followers?.length}</Box>}
                             { <Box><AccessibleForwardIcon/>following: {props?.following?.length || 0}</Box> }
-                            { <Box sx={{display: "flex",alignItems:"center", flexDirection:"column"}}><AccessTimeIcon/>With us since: {new Date(props?.createdAt*1).toDateString()}</Box>}
+                            { <Box sx={{display: "flex",alignItems:"center", flexDirection:"column"}}><AccessTimeIcon/>With us since: {new Date(Number(props?.user_createAt)).toDateString()}</Box>}
                         </Stack>
                     </Stack>   
                             
                     <SavedCollections/>
 
                     <div className="PostList">
-                        {!!aboutMe && posts && _id === aboutMe._id ?<CreatePost onChange={async (e)=>{posts.unshift(await e);; ChangeView(posts?.map(post => <PostWrapper key={post._id} post={post} aboutMe={aboutMe} changePostsToDelete={addPostToDelete} recoverPost={recoverPost} className="post"/> ))}}/>:''}
+                        {!!aboutMe && posts && _id === aboutMe.user_id ?<CreatePost onChange={async (e)=>{ 
+                            takingPosts.unshift(await e); 
+                            console.log('posts has been updated',takingPosts); 
+                            ChangeView(posts?.map(post => <PostWrapper key={post.post_id} post={post} aboutMe={aboutMe} changePostsToDelete={addPostToDelete} recoverPost={recoverPost} className="post"/> ))
+                            }}/>:''}
+                        
                         {SmthToView}
                     </div>
                     
